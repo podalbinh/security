@@ -3,6 +3,7 @@ package com.example.transactionmanagement.controllers;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.text.SimpleDateFormat;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -26,38 +27,86 @@ import com.example.transactionmanagement.dto.request.TransactionRequest;
 import com.example.transactionmanagement.dto.response.TransactionResponse;
 import com.example.transactionmanagement.services.impl.TransactionServiceImpl;
 
+/**
+ * REST Controller for managing transactions.
+ */
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
-      private final TransactionServiceImpl transactionService;
 
+    private final TransactionServiceImpl transactionService;
+
+    /**
+     * Constructor for TransactionController.
+     * 
+     * @param transactionService The transaction service to handle business logic.
+     */
     public TransactionController(TransactionServiceImpl transactionService) {
         this.transactionService = transactionService;
     }
 
+    /**
+     * GET /transactions : Get all transactions.
+     * 
+     * @param pageable Pagination information.
+     * @return ResponseEntity with a page of TransactionResponse.
+     */
     @GetMapping
     public ResponseEntity<Page<TransactionResponse>> getAllTransactions(Pageable pageable) {
         Page<TransactionResponse> transactions = transactionService.findAll(pageable);
         return ResponseEntity.ok(transactions);
     }
 
+    /**
+     * GET /transactions/{id} : Get a transaction by its ID.
+     * 
+     * @param id The ID of the transaction.
+     * @return ResponseEntity with the TransactionResponse.
+     * @throws InvalidKeyException    If an invalid key is encountered during encryption.
+     * @throws NoSuchAlgorithmException If no such algorithm exists.
+     * @throws NoSuchProviderException If no such provider exists.
+     * @throws NoSuchPaddingException If no such padding exists.
+     * @throws IllegalBlockSizeException If an illegal block size is encountered during encryption.
+     * @throws BadPaddingException    If bad padding is encountered during encryption.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> getTransactionById(@PathVariable Long id) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         TransactionResponse transaction = transactionService.get(id);
         return ResponseEntity.ok(transaction);
     }
 
+    /**
+     * POST /transactions : Create a new transaction.
+     * 
+     * @param transactionRequest The transaction request body.
+     * @return ResponseEntity with the ID of the created transaction.
+     * @throws Exception If an error occurs during transaction creation or encryption.
+     */
     @PostMapping
     public ResponseEntity<Long> createTransaction(@RequestBody TransactionRequest transactionRequest) throws Exception {
         Long id = transactionService.create(transactionService.encryptTransactionRequest(transactionRequest));
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
+    /**
+     * PUT /transactions/{id} : Update an existing transaction.
+     * 
+     * @param id The ID of the transaction to update.
+     * @param transactionRequest The updated transaction request body.
+     * @return ResponseEntity with the updated TransactionResponse.
+     * @throws Exception If an error occurs during transaction update or encryption.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<TransactionResponse> updateTransaction(@PathVariable Long id, @RequestBody TransactionRequest transactionRequest) throws Exception {
-        return ResponseEntity.ok( transactionService.update(id,transactionService.encryptTransactionRequest(transactionRequest)));
+        return ResponseEntity.ok(transactionService.update(id, transactionService.encryptTransactionRequest(transactionRequest)));
     }
 
+    /**
+     * DELETE /transactions/{id} : Delete a transaction by its ID.
+     * 
+     * @param id The ID of the transaction to delete.
+     * @return ResponseEntity indicating successful deletion.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.delete(id);

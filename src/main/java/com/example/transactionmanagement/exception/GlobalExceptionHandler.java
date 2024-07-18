@@ -19,7 +19,8 @@ import com.example.transactionmanagement.utils.Constants;
 import com.example.transactionmanagement.utils.MessagesConstants;
 
 import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Global exception handler for handling various exceptions across the application.
  */
@@ -106,4 +107,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    }
+}

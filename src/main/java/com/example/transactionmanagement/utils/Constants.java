@@ -71,6 +71,10 @@ public class Constants {
      * The version of the API.
      */
     public static final String API_VERSION = "1.0.0";
+    public static final String ERROR_DECRYPTING_ACCOUNT_NUMBER = "Error decrypting account number";
+    public static final String ATTRIBUTE_NOT_NULL = "Attribute must not be null";
+
+
 
 
 }

@@ -13,21 +13,7 @@ import java.util.Base64;
 @Component
 public class AESUtil {
     private static final String ALGORITHM = "AES";
-    private static final int KEY_SIZE = 128;
-    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
-    private static final SecretKeySpec secretKey;
-
-    static {
-        try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
-            keyGenerator.init(KEY_SIZE);
-            SecretKey secret = keyGenerator.generateKey();
-            secretKey = new SecretKeySpec(secret.getEncoded(), ALGORITHM);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error initializing AES key", e);
-        }
-    }
-
+    private static final String SECRET_KEY="2B7E151628AED2A6ABF7158809CF4F3C";
     /**
      * Encrypts a string using AES encryption.
      *
@@ -43,12 +29,13 @@ public class AESUtil {
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
         if (data == null) {
-            throw new IllegalArgumentException("Data must not be null");
+            throw new IllegalArgumentException(MessagesConstants.DATA_NOT_NULL);
         }
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedBytes);
+        SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            byte[] encryptedData = cipher.doFinal(data.getBytes());
+            return Base64.getEncoder().encodeToString(encryptedData);
     }
 
     /**
@@ -66,12 +53,12 @@ public class AESUtil {
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
         if (encryptedData == null) {
-            throw new IllegalArgumentException("Encrypted Data must not be null");
+            throw new IllegalArgumentException(MessagesConstants.ENCRYPT_DATA_NOT_NULL);
         }
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
-        byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-        return new String(decryptedBytes);
+        SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+            return new String(decryptedData);
     }
 }
