@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ErrorDetails> handleDataAccessException(DataAccessException exception,
                                                                   WebRequest webRequest) {
-        log.error(Constants.LOG_DATA_ACCESS_EXCEPTION, exception.getMessage());
+        logErrorWithMasking(Constants.LOG_DATA_ACCESS_EXCEPTION,exception, webRequest); 
         ErrorDetails errorDetails = new ErrorDetails(new Date(),  exception.getMessage(),
         webRequest.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
@@ -74,8 +74,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException exception,
                                                                         WebRequest webRequest) {
-        log.error(Constants.LOG_RESOURCE_NOT_FOUND_EXCEPTION, exception.getMessage());
-
+        logErrorWithMasking(Constants.LOG_RESOURCE_NOT_FOUND_EXCEPTION,exception, webRequest); 
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
                 webRequest.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
@@ -84,8 +83,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDetails> handleIllegalArgumentException(IllegalArgumentException exception,
                                                                         WebRequest webRequest) {
-        log.error(Constants.LOG_RESOURCE_NOT_FOUND_EXCEPTION, exception.getMessage());
-
+        logErrorWithMasking(Constants.LOG_RESOURCE_NOT_FOUND_EXCEPTION,exception, webRequest); 
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
                 webRequest.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
@@ -101,10 +99,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGlobalException(Exception exception,
                                                               WebRequest webRequest) {
-        log.error(Constants.LOG_EXCEPTION, exception.getMessage());                                        
+        logErrorWithMasking(Constants.LOG_EXCEPTION, exception, webRequest);                                       
         ErrorDetails errorDetails = new ErrorDetails(new Date(),  exception.getMessage(),
                webRequest.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+    private void logErrorWithMasking(String errorMessage, Exception exception, WebRequest webRequest) {
+        log.error( errorMessage + maskSensitiveInfo(exception.getMessage()) + " - " + maskSensitiveInfo(webRequest.getDescription(false)));
+    }
+
+    private String maskSensitiveInfo(String originalMessage) {
+        return originalMessage.replaceAll(Constants.NUMERIC_REGEX, Constants.MASKED)
+                .replaceAll(Constants.DECIMAL_REGEX,Constants.MASKED)
+                .replaceAll(Constants.DATE_TIME_REGEX, Constants.MASKED);
+    }
 }

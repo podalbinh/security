@@ -25,17 +25,17 @@ public class Constants {
     /**
      * Logging message for data access exceptions.
      */
-    public static final String LOG_DATA_ACCESS_EXCEPTION = "Data access exception occurred: {}";
+    public static final String LOG_DATA_ACCESS_EXCEPTION = "Data access exception occurred: ";
 
     /**
      * Logging message for general exceptions.
      */
-    public static final String LOG_EXCEPTION = "Exception occurred: {}";
+    public static final String LOG_EXCEPTION = "Exception occurred: ";
 
     /**
      * Logging message for resource not found exceptions.
      */
-    public static final String LOG_RESOURCE_NOT_FOUND_EXCEPTION="Resource not found occurred: {}";
+    public static final String LOG_RESOURCE_NOT_FOUND_EXCEPTION="Resource not found occurred: ";
 
       /**
      * Basename for the resource bundle message source.
@@ -74,7 +74,10 @@ public class Constants {
     public static final String ERROR_DECRYPTING_ACCOUNT_NUMBER = "Error decrypting account number";
     public static final String ATTRIBUTE_NOT_NULL = "Attribute must not be null";
 
-
+    public static final String MASKED = "?";
+    public static final String DATE_TIME_REGEX = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
+    public static final String NUMERIC_REGEX = "\\d+";
+    public static final String DECIMAL_REGEX = "\\d+\\.\\d+";
 
 
 }
