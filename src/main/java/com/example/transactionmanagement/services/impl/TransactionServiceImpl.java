@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
@@ -12,6 +13,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ import com.example.transactionmanagement.entities.Transaction;
 import com.example.transactionmanagement.exception.ResourceNotFoundException;
 import com.example.transactionmanagement.repositories.ITransactionRepository;
 import com.example.transactionmanagement.services.ITransactionService;
-
+import com.example.transactionmanagement.utils.Constants;
 import com.example.transactionmanagement.utils.MessagesConstants;
 import com.example.transactionmanagement.utils.RSAUtil;
 
@@ -188,8 +190,8 @@ public class TransactionServiceImpl implements ITransactionService {
             BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
         TransactionRequest encryptedRequest = new TransactionRequest();
         modelMapper.map(request, encryptedRequest);
-        encryptedRequest.setTransactionId(RSAUtil.encrypt(request.getTransactionId()));
-        encryptedRequest.setAccount(RSAUtil.encrypt(request.getAccount()));
+        encryptedRequest.setTransactionId(RSAUtil.decrypt(request.getTransactionId()));
+        encryptedRequest.setAccount(RSAUtil.decrypt(request.getAccount()));
         return encryptedRequest;
     }
 
@@ -214,5 +216,54 @@ public class TransactionServiceImpl implements ITransactionService {
         encryptedRequest.setAccount(RSAUtil.decrypt(encryptedRequest.getAccount()));
         return encryptedRequest;
     }
+    
+   /**
+     * Processes a transfer transaction by creating two transaction records:
+     * one for the debit transaction on the source account and one for the credit transaction on the destination account.
+     * Ensures that none of the parameters are null before proceeding with the transaction.
+     *
+     * @param transactionId the transaction ID associated with the transfer
+     * @param sourceAccount the source account number from which the amount is debited
+     * @param destinationAccount the destination account number to which the amount is credited
+     * @param amount the amount to be transferred
+    * @throws InvalidKeySpecException 
+    * @throws UnsupportedEncodingException 
+    * @throws BadPaddingException 
+    * @throws IllegalBlockSizeException 
+    * @throws NoSuchPaddingException 
+    * @throws NoSuchAlgorithmException 
+    * @throws InvalidKeyException 
+     * @throws IllegalArgumentException if any parameter is null
+     */
+    public void processTransfer(String transactionId, String sourceAccount, String destinationAccount, String amount) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
+        if (transactionId == null) {
+            throw new IllegalArgumentException(Constants.TRANSACTIONID_NOT_NULL);
+        }
+        if ( sourceAccount == null ) {
+            throw new IllegalArgumentException(Constants.SOURCEACCOUNT_NOT_NULL);
+        }
+        if (destinationAccount == null ) {
+            throw new IllegalArgumentException(Constants.DESTINATIONACCOUNT_NOT_NULL);
+        }
+        if ( amount == null) {
+            throw new IllegalArgumentException(Constants.AMOUNT_NOT_NULL);
+        }
+        Date now = new Date();
+        Transaction debitTransaction = new Transaction();
+        debitTransaction.setTransactionId(RSAUtil.decrypt(transactionId));
+        debitTransaction.setAccount(RSAUtil.decrypt(sourceAccount));
+        debitTransaction.setInDebt(Double.parseDouble(RSAUtil.decrypt(amount)));
+        debitTransaction.setHave(0.0);
+        debitTransaction.setTime(now);
 
+        Transaction creditTransaction = new Transaction();
+        creditTransaction.setTransactionId(RSAUtil.decrypt(transactionId));
+        creditTransaction.setAccount(RSAUtil.decrypt(destinationAccount));
+        creditTransaction.setInDebt(0.0);
+        creditTransaction.setHave(Double.parseDouble(RSAUtil.decrypt(amount)));
+        creditTransaction.setTime(now);
+
+        transactionRepository.save(debitTransaction);
+        transactionRepository.save(creditTransaction);
+    }
 }

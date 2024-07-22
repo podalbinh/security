@@ -107,7 +107,7 @@ public class GlobalExceptionHandler {
 
 
     private void logErrorWithMasking(String errorMessage, Exception exception, WebRequest webRequest) {
-        log.error( errorMessage + maskSensitiveInfo(exception.getMessage()) + " - " + maskSensitiveInfo(webRequest.getDescription(false)));
+        log.error( errorMessage + maskSensitiveInfo(exception.getMessage()) + maskSensitiveInfo(webRequest.getDescription(false)));
     }
 
     private String maskSensitiveInfo(String originalMessage) {

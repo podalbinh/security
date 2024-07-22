@@ -2,6 +2,8 @@ package com.example.transactionmanagement.utils;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +15,7 @@ import java.util.Base64;
 @Component
 public class AESUtil {
     private static final String ALGORITHM = "AES";
-    private static final String SECRET_KEY="2B7E151628AED2A6ABF7158809CF4F3C";
+    private static String SECRET_KEY="2B7E151628AED2A6ABF7158809CF4F3C";
     /**
      * Encrypts a string using AES encryption.
      *

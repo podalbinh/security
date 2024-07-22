@@ -1,8 +1,10 @@
 package com.example.transactionmanagement.services;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -63,4 +65,21 @@ public interface ITransactionService {
      * @param id the ID of the transaction to delete
      */
     public void delete(final Long id);
+    /**
+     * Processes a transfer transaction by creating two transaction records:
+     * one for the debit transaction on the source account and one for the credit transaction on the destination account.
+     *
+     * @param transactionId the transaction ID associated with the transfer
+     * @param sourceAccount the source account number from which the amount is debited
+     * @param destinationAccount the destination account number to which the amount is credited
+     * @param amount the amount to be transferred
+     * @throws InvalidKeySpecException 
+     * @throws UnsupportedEncodingException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     */
+    public void processTransfer(String transactionId, String sourceAccount, String destinationAccount, String amount) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException;
 }

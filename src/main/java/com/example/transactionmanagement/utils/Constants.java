@@ -78,6 +78,10 @@ public class Constants {
     public static final String DATE_TIME_REGEX = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
     public static final String NUMERIC_REGEX = "\\d+";
     public static final String DECIMAL_REGEX = "\\d+\\.\\d+";
-
-
+    public static final String NOT_NULL = "None of the parameters can be null";
+    public static final String TRANSACTION_NOT_NULL = "Transaction can not be null";
+    public static final String TRANSACTIONID_NOT_NULL = "Transaction ID cannot be null";
+    public static final String SOURCEACCOUNT_NOT_NULL = "Source account cannot be null";
+    public static final String DESTINATIONACCOUNT_NOT_NULL = "Destination account cannot be null";
+    public static final String AMOUNT_NOT_NULL = "Amount cannot be null";
 }

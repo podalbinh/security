@@ -58,7 +58,7 @@ public class RSAUtil {
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
         if (data == null) {
-            throw new IllegalArgumentException("Data cannot be null");
+            throw new IllegalArgumentException(MessagesConstants.DATA_NOT_NULL);
         }
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(PUBLIC_KEY));
@@ -84,7 +84,7 @@ public class RSAUtil {
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
         if (encryptedData == null) {
-            throw new IllegalArgumentException("Encrypted data cannot be null");
+            throw new IllegalArgumentException(MessagesConstants.ENCRYPT_DATA_NOT_NULL);
         }
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(PRIVATE_KEY));

@@ -1,8 +1,10 @@
 package com.example.transactionmanagement.controllers;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
 
 import javax.crypto.BadPaddingException;
@@ -21,11 +23,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.transactionmanagement.dto.request.TransactionRequest;
 import com.example.transactionmanagement.dto.response.TransactionResponse;
 import com.example.transactionmanagement.services.impl.TransactionServiceImpl;
+import com.example.transactionmanagement.utils.RSAUtil;
 
 /**
  * REST Controller for managing transactions.
@@ -111,5 +115,34 @@ public class TransactionController {
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+     /**
+     * Processes a transfer request by creating two transaction records:
+     * one for the debit transaction on the source account and one for the credit transaction on the destination account.
+     * Ensures that none of the parameters are null before proceeding with the transaction.
+     *
+     * @param transactionId the transaction ID associated with the transfer
+     * @param sourceAccount the source account number from which the amount is debited
+     * @param destinationAccount the destination account number to which the amount is credited
+     * @param amount the amount to be transferred
+     * @return a response indicating the result of the transfer operation
+     * @throws InvalidKeySpecException 
+     * @throws UnsupportedEncodingException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     */
+    @PostMapping("/process")
+    public ResponseEntity<String> processTransfer(
+            @RequestParam String transactionId,
+            @RequestParam String sourceAccount,
+            @RequestParam String destinationAccount,
+            @RequestParam Double amount) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
+            transactionService.processTransfer(RSAUtil.encrypt(transactionId), RSAUtil.encrypt(sourceAccount), RSAUtil.encrypt(destinationAccount), String.valueOf(amount));
+            return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
